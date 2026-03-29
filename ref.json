@@ -1,0 +1,48 @@
+{
+  "_instructions": {
+    "step_1_party_details": "Update the party details below when confirmed. Set 'manifestoStatus' to 'published' and 'estimated' to false when the manifesto is released. Add the manifesto URL.",
+    "step_2_scores": "Update each score in 'topicScores' based on the published manifesto. Use the scale below.",
+    "score_scale": {
+      "5": "STRONGLY CHAMPIONS — A flagship commitment, central to their manifesto",
+      "4": "SUPPORTIVE — Included in their programme, a clear positive position",
+      "3": "NEUTRAL — No clear position, ambiguous, or not mentioned",
+      "2": "MILD OPPOSITION — Sceptical or would scale back",
+      "1": "STRONGLY OPPOSED — Explicitly against, would reverse or block"
+    },
+    "tip": "When in doubt between two scores, pick the lower one to avoid overstating a party's commitment."
+  },
+
+  "id": "ref",
+  "name": "Reform UK Scotland",
+  "short": "Reform",
+  "leader": "To be confirmed",
+  "web": "https://www.reformparty.uk",
+  "manifestoStatus": "pending",
+  "manifestoUrl": null,
+  "estimated": true,
+  "colour": {
+    "bg": "#12B6DF",
+    "fg": "#FFFFFF",
+    "border": "#0994BA"
+  },
+
+  "topicScores": {
+    "independence": 1,
+    "nhs":          3,
+    "education":    2,
+    "climate":      1,
+    "economy":      4,
+    "housing":      2,
+    "costliving":   3,
+    "transport":    2,
+    "socialcare":   2,
+    "drugs":        1,
+    "landreform":   1,
+    "policing":     5,
+    "energy":       2,
+    "equality":     1,
+    "rural":        3,
+    "immigration":  1,
+    "tax":          1
+  }
+}

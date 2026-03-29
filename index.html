@@ -576,157 +576,15 @@ Normalised   = (PMS − min) ÷ (max − min) × 100</div>
      1 = Strongly opposed
    ══════════════════════════════════════════════════════════════════ */
 
-// ── PARTY DATA ─────────────────────────────────────────────────────
-// estimated: true  → scores are pre-manifesto estimates (shown to user)
-// estimated: false → scores from official published manifesto
+// ── PARTY & TOPIC DATA — loaded from data.json ─────────────────────
+// Edit data.json to update scores; no need to touch this file.
 
-const PARTIES = [
-  {
-    id: 'lab', name: 'Scottish Labour', short: 'Labour',
-    leader: 'Anas Sarwar MSP',
-    web: 'https://www.scottishlabour.org.uk',
-    manifestoStatus: 'pending',   // ← CHANGE TO 'published' WHEN READY
-    manifestoUrl: null,           // ← ADD URL WHEN PUBLISHED
-    estimated: true,
-    c: { bg: '#E4003B', fg: '#FFFFFF', bd: '#B80030' }
-  },
-  {
-    id: 'snp', name: 'Scottish National Party', short: 'SNP',
-    leader: 'John Swinney MSP',
-    web: 'https://www.snp.org',
-    manifestoStatus: 'pending',
-    manifestoUrl: null,
-    estimated: true,
-    c: { bg: '#FFF060', fg: '#000000', bd: '#CCBB00' }
-  },
-  {
-    id: 'con', name: 'Scottish Conservative Party', short: 'Con',
-    leader: 'Russell Findlay MSP',
-    web: 'https://www.scottishconservatives.com',
-    manifestoStatus: 'pending',
-    manifestoUrl: null,
-    estimated: true,
-    c: { bg: '#003087', fg: '#FFFFFF', bd: '#001E5E' }
-  },
-  {
-    id: 'ld',  name: 'Scottish Liberal Democrats', short: 'LD',
-    leader: 'Alex Cole-Hamilton MSP',
-    web: 'https://www.scotlibdems.org.uk',
-    manifestoStatus: 'pending',
-    manifestoUrl: null,
-    estimated: true,
-    c: { bg: '#FAA61A', fg: '#FFFFFF', bd: '#D88500' }
-  },
-  {
-    id: 'ref', name: 'Reform UK Scotland', short: 'Reform',
-    leader: 'To be confirmed',
-    web: 'https://www.reformparty.uk',
-    manifestoStatus: 'pending',
-    manifestoUrl: null,
-    estimated: true,
-    c: { bg: '#12B6DF', fg: '#FFFFFF', bd: '#0994BA' }
-  }
-];
-
-// ── TOPIC DATA ─────────────────────────────────────────────────────
-// scores: { partyId: PS (1–5), … }
-// UPDATE each party's score when their manifesto is published
-
-const TOPICS = [
-  {
-    id: 'independence', name: 'Scottish Independence', icon: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-    desc: 'Scotland becoming an independent country',
-    // NOTE: Positions on independence are well-established across all parties
-    scores: { lab:1, snp:5, con:1, ld:2, ref:1 }
-  },
-  {
-    id: 'nhs', name: 'NHS & Healthcare', icon: '🏥',
-    desc: 'NHS investment, waiting times, mental health services',
-    scores: { lab:5, snp:4, con:3, ld:4, ref:3 }
-  },
-  {
-    id: 'education', name: 'Education', icon: '🎓',
-    desc: 'Schools, free university tuition, curriculum reform',
-    scores: { lab:4, snp:4, con:3, ld:4, ref:2 }
-  },
-  {
-    id: 'climate', name: 'Climate & Environment', icon: '🌍',
-    desc: 'Net zero targets, renewables, environmental protection',
-    scores: { lab:4, snp:4, con:2, ld:4, ref:1 }
-  },
-  {
-    id: 'economy', name: 'Economy & Jobs', icon: '💼',
-    desc: 'Growth, employment, business support, wages',
-    scores: { lab:4, snp:3, con:4, ld:3, ref:4 }
-  },
-  {
-    id: 'housing', name: 'Housing & Homelessness', icon: '🏠',
-    desc: 'Affordable housing, rent controls, social housing',
-    scores: { lab:4, snp:3, con:2, ld:3, ref:2 }
-  },
-  {
-    id: 'costliving', name: 'Cost of Living', icon: '🛒',
-    desc: 'Household bills, benefits, tackling rising prices',
-    scores: { lab:5, snp:3, con:3, ld:4, ref:3 }
-  },
-  {
-    id: 'transport', name: 'Public Transport', icon: '🚆',
-    desc: 'Rail, buses, active travel, rural connectivity',
-    scores: { lab:4, snp:3, con:2, ld:4, ref:2 }
-  },
-  {
-    id: 'socialcare', name: 'Social Care', icon: '👴',
-    desc: 'Elderly care, disability support, carers, free personal care',
-    scores: { lab:5, snp:4, con:3, ld:4, ref:2 }
-  },
-  {
-    id: 'drugs', name: 'Drug Policy Reform', icon: '💊',
-    desc: 'Tackling drug deaths, treatment services, harm reduction',
-    scores: { lab:4, snp:4, con:2, ld:4, ref:1 }
-  },
-  {
-    id: 'landreform', name: 'Land Reform', icon: '🌾',
-    desc: 'Community land ownership, diversifying land ownership',
-    scores: { lab:4, snp:3, con:2, ld:3, ref:1 }
-  },
-  {
-    id: 'policing', name: 'Policing & Justice', icon: '⚖️',
-    desc: 'Police Scotland, criminal justice, community safety',
-    scores: { lab:4, snp:3, con:4, ld:3, ref:5 }
-  },
-  {
-    id: 'energy', name: 'Energy Policy', icon: '⚡',
-    desc: 'Renewables, oil & gas transition, energy costs',
-    scores: { lab:3, snp:4, con:4, ld:4, ref:2 }
-  },
-  {
-    id: 'equality', name: 'Equality & Rights', icon: '🏳️‍🌈',
-    desc: 'LGBTQ+ rights, gender equality, disability rights',
-    scores: { lab:4, snp:4, con:2, ld:4, ref:1 }
-  },
-  {
-    id: 'rural', name: 'Rural Affairs & Farming', icon: '🐄',
-    desc: 'Agricultural support, rural communities, fishing',
-    scores: { lab:3, snp:3, con:4, ld:3, ref:3 }
-  },
-  {
-    id: 'immigration', name: 'Immigration & Borders', icon: '🛂',
-    desc: 'Immigration policy, asylum seekers, border control',
-    scores: { lab:3, snp:4, con:2, ld:3, ref:1 }
-  },
-  {
-    id: 'tax', name: 'Tax & Public Spending', icon: '💰',
-    desc: 'Income tax rates, council tax, public spending levels',
-    scores: { lab:4, snp:3, con:2, ld:3, ref:1 }
-  }
-];
+let PARTIES = [];
+let TOPICS  = [];
 
 // ── APP STATE ──────────────────────────────────────────────────────
 const sel     = new Set();
 const userPos = {}; // { topicId: { dir:'support'|'neutral'|'oppose', str:1-5 } }
-
-// Initialise defaults
-TOPICS.forEach(t => { userPos[t.id] = { dir:'support', str:3 }; });
 
 // ── HELPERS ────────────────────────────────────────────────────────
 const byId   = id => document.getElementById(id);
@@ -734,14 +592,23 @@ const party  = id => PARTIES.find(p => p.id === id);
 const topic  = id => TOPICS.find(t => t.id === id);
 const strLbl = n  => ['','Slightly','Somewhat','Moderately','Very','Extremely'][n] || '';
 
+// Returns the human-readable label for a user's direction on a given topic
+function dirLabel(t, dir) {
+  const lbl = t.questionLabels || {};
+  return dir === 'support' ? (lbl.support || 'Support')
+       : dir === 'oppose'  ? (lbl.oppose  || 'Oppose')
+       :                     (lbl.neutral || 'Neutral');
+}
+
 function logo(partyId, sm) {
   const p = party(partyId); if (!p) return '';
+  const c = p.colour || p.c || {};
   const sz = sm ? 28 : 36, r = sm ? 6 : 8, fs = sm ? 8 : 9.5;
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:${r}px;display:inline-block">
-    <rect width="${sz}" height="${sz}" rx="${r}" fill="${p.c.bg}" stroke="${p.c.bd}" stroke-width="1.2"/>
+    <rect width="${sz}" height="${sz}" rx="${r}" fill="${c.bg}" stroke="${c.border || c.bd}" stroke-width="1.2"/>
     <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle"
       font-family="'DM Sans',system-ui,sans-serif" font-weight="800" font-size="${fs}"
-      fill="${p.c.fg}" letter-spacing="-0.5">${p.short.length > 4 ? p.short.slice(0,4) : p.short}</text>
+      fill="${c.fg}" letter-spacing="-0.5">${p.short.length > 4 ? p.short.slice(0,4) : p.short}</text>
   </svg>`;
 }
 
@@ -803,16 +670,18 @@ function renderPos() {
   byId('pos-container').innerHTML = [...sel].map(id => {
     const t = topic(id);
     const p = userPos[id];
+    const [supLbl, neutLbl, oppLbl] = t.dirs || ['Support', 'Neutral', 'Oppose'];
     return `
       <div class="pos-row">
         <div class="pos-title"><span>${t.icon}</span> ${t.name}</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:10px">${t.desc}</div>
         <div class="dir-btns">
-          <button class="dir-btn ${p.dir==='support' ? 'd-sup' : ''}"  onclick="setDir('${id}','support')">✓ Support</button>
-          <button class="dir-btn ${p.dir==='neutral' ? 'd-neut' : ''}" onclick="setDir('${id}','neutral')">— Neutral</button>
-          <button class="dir-btn ${p.dir==='oppose'  ? 'd-opp'  : ''}" onclick="setDir('${id}','oppose')">✗ Oppose</button>
+          <button class="dir-btn ${p.dir==='support' ? 'd-sup' : ''}"  onclick="setDir('${id}','support')">✓ ${supLbl}</button>
+          <button class="dir-btn ${p.dir==='neutral' ? 'd-neut' : ''}" onclick="setDir('${id}','neutral')">— ${neutLbl}</button>
+          <button class="dir-btn ${p.dir==='oppose'  ? 'd-opp'  : ''}" onclick="setDir('${id}','oppose')">✗ ${oppLbl}</button>
         </div>
         <div class="str-row">
-          <span class="str-label">Strength:</span>
+          <span class="str-label">How important is this to you?</span>
           <div class="str-dots">
             ${[1,2,3,4,5].map(n => `<div class="str-dot ${p.str >= n ? 'active' : ''}" onclick="setStr('${id}',${n})">${n}</div>`).join('')}
           </div>
@@ -840,7 +709,7 @@ function calcResults() {
     let pms = 0;
     const contribs = ids.map(tid => {
       const tp  = topic(tid);
-      const ps  = tp.scores[pt.id] ?? 3;
+      const ps  = (tp.partyScores || tp.scores || {})[pt.id] ?? 3;
       const {dir, str: uss} = userPos[tid];
       const usign = dir==='support' ? 1 : dir==='oppose' ? -1 : 0;
       const mc  = uss * (ps - 3) * usign;
@@ -906,22 +775,22 @@ function renderResults(results) {
           ${pos.length ? `
             <div style="margin-bottom:16px">
               <div class="detail-section-title" style="color:var(--ok)">✓ Top alignments</div>
-              ${pos.map(c => { const t = topic(c.tid); return `
+              ${pos.map(c => { const t = topic(c.tid); const dl = dirLabel(t, c.dir); return `
                 <div class="detail-row">
                   <span>${t.icon}</span>
                   <span class="dr-name">${t.name}</span>
-                  <span class="dr-meta">You: ${c.dir} (${c.uss}/5) · Party: ${c.ps}/5</span>
+                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party: ${c.ps}/5</span>
                 </div>`; }).join('')}
             </div>
           ` : ''}
           ${neg.length ? `
             <div style="margin-bottom:16px">
               <div class="detail-section-title" style="color:var(--err)">✗ Key mismatches</div>
-              ${neg.map(c => { const t = topic(c.tid); return `
+              ${neg.map(c => { const t = topic(c.tid); const dl = dirLabel(t, c.dir); return `
                 <div class="detail-row">
                   <span>${t.icon}</span>
                   <span class="dr-name">${t.name}</span>
-                  <span class="dr-meta">You: ${c.dir} (${c.uss}/5) · Party: ${c.ps}/5</span>
+                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party: ${c.ps}/5</span>
                 </div>`; }).join('')}
             </div>
           ` : ''}
@@ -1006,8 +875,53 @@ function renderHomeGrid() {
   `).join('');
 }
 
-// ── INIT ───────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+// ── INIT — load topics.json + individual party files, then render ───
+document.addEventListener('DOMContentLoaded', async () => {
+  const PARTY_FILES = ['lab', 'snp', 'con', 'ld', 'ref'];
+
+  try {
+    // Fetch topics and all party files in parallel
+    const [topicsRes, ...partyRes] = await Promise.all([
+      fetch('topics.json'),
+      ...PARTY_FILES.map(id => fetch(`parties/${id}.json`))
+    ]);
+
+    if (!topicsRes.ok) throw new Error(`topics.json — HTTP ${topicsRes.status}`);
+    const topicsData = await topicsRes.json();
+    TOPICS = topicsData.topics || [];
+
+    // Load each party file; skip gracefully if one fails
+    const partyData = await Promise.all(
+      partyRes.map(async (res, i) => {
+        if (!res.ok) {
+          console.warn(`parties/${PARTY_FILES[i]}.json failed — skipping`);
+          return null;
+        }
+        return res.json();
+      })
+    );
+    PARTIES = partyData.filter(Boolean);
+
+    // Merge party scores into topics for easy lookup
+    TOPICS.forEach(t => {
+      t.partyScores = {};
+      PARTIES.forEach(p => {
+        t.partyScores[p.id] = (p.topicScores || {})[t.id] ?? 3;
+      });
+    });
+
+  } catch (e) {
+    document.body.innerHTML = `<div style="padding:60px;text-align:center;font-family:sans-serif">
+      <h2 style="color:#B8302A">Could not load data files</h2>
+      <p style="color:#555;margin-top:12px">Make sure <code>topics.json</code> and the <code>parties/</code> folder are present alongside <code>index.html</code>, and that you are running from a web server (not a local file).</p>
+      <p style="color:#999;font-size:.85rem;margin-top:8px">Error: ${e.message}</p>
+    </div>`;
+    return;
+  }
+
+  // Initialise user positions with defaults
+  TOPICS.forEach(t => { userPos[t.id] = { dir: 'support', str: 3 }; });
+
   renderGrid();
   renderPartyTable();
   renderHomeGrid();

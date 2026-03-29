@@ -1,0 +1,48 @@
+{
+  "_instructions": {
+    "step_1_party_details": "Update the party details below when confirmed. Set 'manifestoStatus' to 'published' and 'estimated' to false when the manifesto is released. Add the manifesto URL.",
+    "step_2_scores": "Update each score in 'topicScores' based on the published manifesto. Use the scale below.",
+    "score_scale": {
+      "5": "STRONGLY CHAMPIONS — A flagship commitment, central to their manifesto",
+      "4": "SUPPORTIVE — Included in their programme, a clear positive position",
+      "3": "NEUTRAL — No clear position, ambiguous, or not mentioned",
+      "2": "MILD OPPOSITION — Sceptical or would scale back",
+      "1": "STRONGLY OPPOSED — Explicitly against, would reverse or block"
+    },
+    "tip": "When in doubt between two scores, pick the lower one to avoid overstating a party's commitment."
+  },
+
+  "id": "ld",
+  "name": "Scottish Liberal Democrats",
+  "short": "LD",
+  "leader": "Alex Cole-Hamilton MSP",
+  "web": "https://www.scotlibdems.org.uk",
+  "manifestoStatus": "pending",
+  "manifestoUrl": null,
+  "estimated": true,
+  "colour": {
+    "bg": "#FAA61A",
+    "fg": "#FFFFFF",
+    "border": "#D88500"
+  },
+
+  "topicScores": {
+    "independence": 2,
+    "nhs":          4,
+    "education":    4,
+    "climate":      4,
+    "economy":      3,
+    "housing":      3,
+    "costliving":   4,
+    "transport":    4,
+    "socialcare":   4,
+    "drugs":        4,
+    "landreform":   3,
+    "policing":     3,
+    "energy":       4,
+    "equality":     4,
+    "rural":        3,
+    "immigration":  3,
+    "tax":          3
+  }
+}

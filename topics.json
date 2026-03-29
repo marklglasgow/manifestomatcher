@@ -1,0 +1,201 @@
+{
+  "_instructions": {
+    "about": "This file defines the topics users can choose from. You should not need to edit this file when manifestos are published — only edit the party files in the parties/ folder.",
+    "adding_a_topic": "To add a new topic: copy an existing block, give it a unique 'id', write the name/icon/desc, set the three questionLabels, and add a score for every party id (lab, snp, con, ld, ref). Then add that party id to every party file under topicScores.",
+    "questionLabels": {
+      "support": "Shown on the left-hand button — the position that ALIGNS with a high party score (4-5)",
+      "neutral": "Shown on the middle button",
+      "oppose":  "Shown on the right-hand button — the position that ALIGNS with a low party score (1-2)"
+    }
+  },
+
+  "topics": [
+    {
+      "id": "independence",
+      "name": "Scottish Independence",
+      "icon": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+      "desc": "Scotland becoming an independent country",
+      "questionLabels": {
+        "support": "Yes to independence",
+        "neutral": "Undecided",
+        "oppose":  "No to independence"
+      }
+    },
+    {
+      "id": "nhs",
+      "name": "NHS & Healthcare",
+      "icon": "🏥",
+      "desc": "NHS investment, waiting times, mental health services",
+      "questionLabels": {
+        "support": "Increase investment",
+        "neutral": "Keep as is",
+        "oppose":  "Reduce / reform"
+      }
+    },
+    {
+      "id": "education",
+      "name": "Education",
+      "icon": "🎓",
+      "desc": "Schools, free university tuition, curriculum reform",
+      "questionLabels": {
+        "support": "Increase investment",
+        "neutral": "Keep as is",
+        "oppose":  "Reduce / reform"
+      }
+    },
+    {
+      "id": "climate",
+      "name": "Climate & Environment",
+      "icon": "🌍",
+      "desc": "Net zero targets, renewables, environmental protection",
+      "questionLabels": {
+        "support": "Prioritise action",
+        "neutral": "Balanced approach",
+        "oppose":  "Deprioritise"
+      }
+    },
+    {
+      "id": "economy",
+      "name": "Economy & Jobs",
+      "icon": "💼",
+      "desc": "Growth, employment, business support, wages",
+      "questionLabels": {
+        "support": "State-led growth",
+        "neutral": "Balanced approach",
+        "oppose":  "Market-led growth"
+      }
+    },
+    {
+      "id": "housing",
+      "name": "Housing & Homelessness",
+      "icon": "🏠",
+      "desc": "Affordable housing, rent controls, social housing",
+      "questionLabels": {
+        "support": "More social housing",
+        "neutral": "Balanced approach",
+        "oppose":  "Market-led supply"
+      }
+    },
+    {
+      "id": "costliving",
+      "name": "Cost of Living",
+      "icon": "🛒",
+      "desc": "Household bills, benefits, tackling rising prices",
+      "questionLabels": {
+        "support": "More government support",
+        "neutral": "Targeted support",
+        "oppose":  "Reduce intervention"
+      }
+    },
+    {
+      "id": "transport",
+      "name": "Public Transport",
+      "icon": "🚆",
+      "desc": "Rail, buses, active travel, rural connectivity",
+      "questionLabels": {
+        "support": "Expand & invest",
+        "neutral": "Keep as is",
+        "oppose":  "Reduce subsidy"
+      }
+    },
+    {
+      "id": "socialcare",
+      "name": "Social Care",
+      "icon": "👴",
+      "desc": "Elderly care, disability support, carers, free personal care",
+      "questionLabels": {
+        "support": "Increase investment",
+        "neutral": "Keep as is",
+        "oppose":  "Reform / reduce"
+      }
+    },
+    {
+      "id": "drugs",
+      "name": "Drug Policy Reform",
+      "icon": "💊",
+      "desc": "Tackling drug deaths, treatment services, harm reduction",
+      "questionLabels": {
+        "support": "Decriminalise / treat",
+        "neutral": "Current approach",
+        "oppose":  "Tougher enforcement"
+      }
+    },
+    {
+      "id": "landreform",
+      "name": "Land Reform",
+      "icon": "🌾",
+      "desc": "Community land ownership, diversifying land ownership",
+      "questionLabels": {
+        "support": "More reform",
+        "neutral": "Some reform",
+        "oppose":  "Protect current ownership"
+      }
+    },
+    {
+      "id": "policing",
+      "name": "Policing & Justice",
+      "icon": "⚖️",
+      "desc": "Police Scotland, criminal justice, community safety",
+      "questionLabels": {
+        "support": "More police & powers",
+        "neutral": "Current approach",
+        "oppose":  "Reform-focused"
+      }
+    },
+    {
+      "id": "energy",
+      "name": "Energy Policy",
+      "icon": "⚡",
+      "desc": "Renewables, oil & gas transition, energy costs",
+      "questionLabels": {
+        "support": "Renewables-first",
+        "neutral": "Balanced transition",
+        "oppose":  "Support oil & gas"
+      }
+    },
+    {
+      "id": "equality",
+      "name": "Equality & Rights",
+      "icon": "🏳️‍🌈",
+      "desc": "LGBTQ+ rights, gender equality, disability rights",
+      "questionLabels": {
+        "support": "Strengthen protections",
+        "neutral": "Current approach",
+        "oppose":  "Roll back"
+      }
+    },
+    {
+      "id": "rural",
+      "name": "Rural Affairs & Farming",
+      "icon": "🐄",
+      "desc": "Agricultural support, rural communities, fishing",
+      "questionLabels": {
+        "support": "More rural support",
+        "neutral": "Keep as is",
+        "oppose":  "Reduce subsidies"
+      }
+    },
+    {
+      "id": "immigration",
+      "name": "Immigration & Borders",
+      "icon": "🛂",
+      "desc": "Immigration policy, asylum seekers, border control",
+      "questionLabels": {
+        "support": "More open policy",
+        "neutral": "Managed approach",
+        "oppose":  "Stricter controls"
+      }
+    },
+    {
+      "id": "tax",
+      "name": "Tax & Public Spending",
+      "icon": "💰",
+      "desc": "Income tax rates, council tax, public spending levels",
+      "questionLabels": {
+        "support": "Higher tax & spend",
+        "neutral": "Balanced approach",
+        "oppose":  "Lower tax & spend"
+      }
+    }
+  ]
+}
