@@ -8,13 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-  .pty-table td, .pty-table th { padding: 16px 20px; }
-  .pty-table .party-cell { display:flex; align-items:center; gap:12px; }
-  .manifesto-published { color: #2A6844; font-weight: 600; font-size: .875rem; }
-  .manifesto-pending   { color: #8A6318; font-weight: 600; font-size: .875rem; }
-  .manifesto-link      { display:block; margin-top:5px; font-size:.8rem; color:var(--accent); text-decoration:none; font-weight:600; }
-  .manifesto-link:hover { text-decoration:underline; }
-  .estimated-note      { display:block; margin-top:4px; font-size:.75rem; color:var(--text-muted); font-weight:400; }
+.pty-table td, .pty-table th { padding: 18px 22px; }
+.party-cell  { display:flex; align-items:center; gap:12px; }
+.party-name  { font-weight:600; font-size:.9375rem; }
+.m-published { color:#2A6844; font-weight:700; font-size:.875rem; }
+.m-pending   { color:#7A5418; font-weight:700; font-size:.875rem; }
+.m-link      { display:block; margin-top:5px; font-size:.8rem; color:var(--accent); text-decoration:none; font-weight:600; }
+.m-link:hover{ text-decoration:underline; }
+.m-note      { display:block; margin-top:4px; font-size:.75rem; color:var(--text-muted); }
+.site-link   { color:var(--accent); text-decoration:none; font-size:.875rem; font-weight:500; }
+.site-link:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -50,18 +53,12 @@
               <th>Website</th>
             </tr>
           </thead>
-          <tbody id="party-tbody">
-            <tr>
-              <td colspan="4" style="text-align:center;color:var(--text-muted);padding:32px">
-                Loading…
-              </td>
-            </tr>
-          </tbody>
+          <tbody id="party-tbody"></tbody>
         </table>
       </div>
 
-      <p style="margin-top:16px;font-size:.8rem;color:var(--text-muted)">
-        * Scores marked as estimated are based on existing public policy positions and will be updated when the official manifesto is published.
+      <p style="margin-top:14px;font-size:.78rem;color:var(--text-muted)">
+        * Where a manifesto has not yet been published, match scores are estimated from each party's existing public policy positions.
       </p>
 
     </div>
@@ -72,53 +69,116 @@
 
 <script src="main.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
+
+/* ── Party data baked directly into this page ───────
+   Update each party here when their manifesto is published:
+     published:     true  / false
+     manifestoUrl:  URL string / null
+   ─────────────────────────────────────────────────── */
+const PAGE_PARTIES = [
+  {
+    id: 'lab',
+    name: 'Scottish Labour',
+    short: 'Labour',
+    leader: 'Anas Sarwar MSP',
+    web: 'https://www.scottishlabour.org.uk',
+    published: false,
+    manifestoUrl: null,
+    colour: { bg:'#E4003B', fg:'#FFFFFF', border:'#B80030' }
+  },
+  {
+    id: 'snp',
+    name: 'Scottish National Party',
+    short: 'SNP',
+    leader: 'John Swinney MSP',
+    web: 'https://www.snp.org',
+    published: false,
+    manifestoUrl: null,
+    colour: { bg:'#FFF060', fg:'#000000', border:'#CCBB00' }
+  },
+  {
+    id: 'con',
+    name: 'Scottish Conservative Party',
+    short: 'Con',
+    leader: 'Russell Findlay MSP',
+    web: 'https://www.scottishconservatives.com',
+    published: false,
+    manifestoUrl: null,
+    colour: { bg:'#003087', fg:'#FFFFFF', border:'#001E5E' }
+  },
+  {
+    id: 'ld',
+    name: 'Scottish Liberal Democrats',
+    short: 'LD',
+    leader: 'Alex Cole-Hamilton MSP',
+    web: 'https://www.scotlibdems.org.uk',
+    published: false,
+    manifestoUrl: null,
+    colour: { bg:'#FAA61A', fg:'#FFFFFF', border:'#D88500' }
+  },
+  {
+    id: 'ref',
+    name: 'Reform UK Scotland',
+    short: 'Reform',
+    leader: 'Malcolm Offord',
+    web: 'https://reformuk.scot',
+    published: true,
+    manifestoUrl: 'https://www.reformparty.uk/scotland-manifesto.pdf',
+    colour: { bg:'#12B6DF', fg:'#FFFFFF', border:'#0994BA' }
+  }
+];
+
+/* ── Render party logo badge ──────────────────────── */
+function partyLogo(p, sm) {
+  const sz = sm ? 28 : 36, r = sm ? 6 : 8, fs = sm ? 8 : 9.5;
+  const lbl = p.short.length > 5 ? p.short.slice(0,5) : p.short;
+  const c = p.colour;
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}"
+    xmlns="http://www.w3.org/2000/svg"
+    style="flex-shrink:0;border-radius:${r}px;display:inline-block;vertical-align:middle">
+    <rect width="${sz}" height="${sz}" rx="${r}"
+      fill="${c.bg}" stroke="${c.border}" stroke-width="1.2"/>
+    <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle"
+      font-family="'DM Sans',system-ui,sans-serif"
+      font-weight="800" font-size="${fs}" fill="${c.fg}"
+      letter-spacing="-0.3">${lbl}</text>
+  </svg>`;
+}
+
+/* ── Build table rows ─────────────────────────────── */
+function buildTable() {
+  document.getElementById('party-tbody').innerHTML = PAGE_PARTIES.map(p => `
+    <tr>
+      <td>
+        <div class="party-cell">
+          ${partyLogo(p)}
+          <span class="party-name">${p.name}</span>
+        </div>
+      </td>
+      <td>${p.leader}</td>
+      <td>
+        ${p.published
+          ? `<span class="m-published">✓ Published</span>
+             ${p.manifestoUrl
+               ? `<a class="m-link" href="${p.manifestoUrl}" target="_blank" rel="noopener">View manifesto →</a>`
+               : ''}`
+          : `<span class="m-pending">Not Published</span>
+             <span class="m-note">* Scores estimated from existing positions</span>`
+        }
+      </td>
+      <td>
+        <a class="site-link" href="${p.web}" target="_blank" rel="noopener">
+          ${p.web.replace('https://','').replace('http://','').replace(/\/$/,'')}
+        </a>
+      </td>
+    </tr>
+  `).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
   initNav('parties');
   initFooter();
-
-  try {
-    await loadData();
-  } catch(e) {
-    showLoadError(e.message);
-    return;
-  }
-
-  const tbody = document.getElementById('party-tbody');
-
-  if (!PARTIES.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:32px">No party data found.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = PARTIES.map(p => {
-    const published = p.manifestoStatus === 'published';
-
-    const manifestoCell = published
-      ? `<span class="manifesto-published">✓ Published</span>
-         ${p.manifestoUrl
-           ? `<a class="manifesto-link" href="${p.manifestoUrl}" target="_blank" rel="noopener">View manifesto →</a>`
-           : ''}`
-      : `<span class="manifesto-pending">Not Published</span>
-         <span class="estimated-note">* Scores estimated from existing positions</span>`;
-
-    return `
-      <tr>
-        <td>
-          <div class="party-cell">
-            ${logo(p.id)}
-            <span style="font-weight:600">${p.name}</span>
-          </div>
-        </td>
-        <td>${p.leader}</td>
-        <td>${manifestoCell}</td>
-        <td>
-          <a href="${p.web}" target="_blank" rel="noopener"
-             style="color:var(--accent);text-decoration:none;font-size:.875rem;font-weight:500">
-            ${p.web.replace('https://','').replace('http://','').replace(/\/$/,'')}
-          </a>
-        </td>
-      </tr>`;
-  }).join('');
+  buildTable();
 });
 </script>
 </body>
