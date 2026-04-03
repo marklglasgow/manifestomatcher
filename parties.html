@@ -7,6 +7,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  .pty-table td, .pty-table th { padding: 16px 20px; }
+  .pty-table .party-cell { display:flex; align-items:center; gap:12px; }
+  .manifesto-published { color: #2A6844; font-weight: 600; font-size: .875rem; }
+  .manifesto-pending   { color: #8A6318; font-weight: 600; font-size: .875rem; }
+  .manifesto-link      { display:block; margin-top:5px; font-size:.8rem; color:var(--accent); text-decoration:none; font-weight:600; }
+  .manifesto-link:hover { text-decoration:underline; }
+  .estimated-note      { display:block; margin-top:4px; font-size:.75rem; color:var(--text-muted); font-weight:400; }
+</style>
 </head>
 <body>
 
@@ -29,37 +38,31 @@
     <div class="section">
 
       <div class="sh">Parties &amp; Manifestos</div>
-      <div class="sh-s">Overview of parties in the 2026 Scottish Parliament election</div>
-
-      <div class="banner banner-warn mb8">
-        <span class="banner-icon">📋</span>
-        <div>Manifesto data is updated as official documents are published. Estimated positions are based on existing public policy commitments and are clearly marked.</div>
-      </div>
-
-      <!-- Party cards -->
-      <div id="party-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:48px">
-        <div style="color:var(--text-muted);font-size:.875rem;padding:12px">Loading parties…</div>
-      </div>
-
-      <!-- Party table -->
-      <div class="sh" style="font-size:1.2rem;margin-bottom:6px">Manifesto status</div>
-      <p style="font-size:.9rem;color:var(--text-2);margin-bottom:20px">A summary of each party's manifesto publication status for the 2026 Scottish Parliament election.</p>
+      <div class="sh-s">2026 Scottish Parliament election — manifesto publication status</div>
 
       <div style="overflow-x:auto">
-        <table class="pty-table">
+        <table class="pty-table" id="party-table">
           <thead>
             <tr>
               <th>Party</th>
               <th>Leader</th>
-              <th>Manifesto Status</th>
+              <th>Manifesto</th>
               <th>Website</th>
             </tr>
           </thead>
-          <tbody id="pty-body">
-            <tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:24px">Loading…</td></tr>
+          <tbody id="party-tbody">
+            <tr>
+              <td colspan="4" style="text-align:center;color:var(--text-muted);padding:32px">
+                Loading…
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
+
+      <p style="margin-top:16px;font-size:.8rem;color:var(--text-muted)">
+        * Scores marked as estimated are based on existing public policy positions and will be updated when the official manifesto is published.
+      </p>
 
     </div>
   </div>
@@ -80,109 +83,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  renderCards();
-  renderTable();
-});
+  const tbody = document.getElementById('party-tbody');
 
-function renderCards() {
   if (!PARTIES.length) {
-    document.getElementById('party-cards').innerHTML =
-      '<p style="color:var(--text-muted)">No party data available.</p>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:32px">No party data found.</td></tr>';
     return;
   }
 
-  document.getElementById('party-cards').innerHTML = PARTIES.map(p => {
-
-    const published   = p.manifestoStatus === 'published';
-    const statusColor = published ? 'var(--ok)'   : '#8A6318';
-    const statusBg    = published ? 'var(--ok-bg)' : 'var(--warn-bg)';
-    const statusIcon  = published ? '✓' : '⏳';
-    const statusText  = published ? 'Manifesto Published' : 'Manifesto Not Yet Published';
-
-    return `
-      <div class="card" style="display:flex;flex-direction:column">
-        <div class="card-body" style="display:flex;gap:14px;align-items:flex-start;flex:1">
-          ${logo(p.id)}
-          <div style="flex:1">
-            <div style="font-weight:700;font-size:1rem;margin-bottom:3px">${p.name}</div>
-            <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px">Leader: ${p.leader}</div>
-
-            <div style="display:inline-flex;align-items:center;gap:6px;background:${statusBg};color:${statusColor};
-                        font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:99px;
-                        letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px">
-              ${statusIcon} ${statusText}
-            </div>
-
-            ${p.estimated ? `
-              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:12px;line-height:1.5">
-                Scores are estimated from existing policy positions until the official manifesto is published.
-              </div>` : ''}
-
-            <div style="display:flex;gap:14px;flex-wrap:wrap">
-              <a href="${p.web}" target="_blank" rel="noopener"
-                 style="font-size:.8125rem;color:var(--accent);font-weight:600;text-decoration:none">
-                Visit website →
-              </a>
-              ${p.manifestoUrl ? `
-                <a href="${p.manifestoUrl}" target="_blank" rel="noopener"
-                   style="font-size:.8125rem;color:var(--accent);font-weight:600;text-decoration:none">
-                  Read manifesto →
-                </a>` : ''}
-            </div>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function renderTable() {
-  if (!PARTIES.length) {
-    document.getElementById('pty-body').innerHTML =
-      '<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:24px">No party data available.</td></tr>';
-    return;
-  }
-
-  document.getElementById('pty-body').innerHTML = PARTIES.map(p => {
+  tbody.innerHTML = PARTIES.map(p => {
     const published = p.manifestoStatus === 'published';
+
+    const manifestoCell = published
+      ? `<span class="manifesto-published">✓ Published</span>
+         ${p.manifestoUrl
+           ? `<a class="manifesto-link" href="${p.manifestoUrl}" target="_blank" rel="noopener">View manifesto →</a>`
+           : ''}`
+      : `<span class="manifesto-pending">Not Published</span>
+         <span class="estimated-note">* Scores estimated from existing positions</span>`;
 
     return `
       <tr>
         <td>
-          <div style="display:flex;align-items:center;gap:10px">
-            ${logo(p.id, true)}
-            <div>
-              <div style="font-weight:600">${p.name}</div>
-              <div style="font-size:.72rem;color:var(--text-muted)">${p.short}</div>
-            </div>
+          <div class="party-cell">
+            ${logo(p.id)}
+            <span style="font-weight:600">${p.name}</span>
           </div>
         </td>
-        <td style="font-size:.875rem">${p.leader}</td>
-        <td>
-          ${published
-            ? `<span class="badge badge-published">✓ Published</span>
-               ${p.manifestoUrl
-                  ? `<div style="margin-top:6px">
-                       <a href="${p.manifestoUrl}" target="_blank" rel="noopener"
-                          style="font-size:.8rem;color:var(--accent);text-decoration:none;font-weight:600">
-                         View manifesto →
-                       </a>
-                     </div>`
-                  : ''}`
-            : `<span class="badge badge-pending">⏳ Not Yet Published</span>
-               <div style="font-size:.72rem;color:var(--text-muted);margin-top:5px">
-                 Scores estimated from existing positions
-               </div>`
-          }
-        </td>
+        <td>${p.leader}</td>
+        <td>${manifestoCell}</td>
         <td>
           <a href="${p.web}" target="_blank" rel="noopener"
-             style="color:var(--accent);font-size:.8125rem;text-decoration:none">
-            ${p.web.replace('https://','').replace('http://','').replace(/\/$/, '')}
+             style="color:var(--accent);text-decoration:none;font-size:.875rem;font-weight:500">
+            ${p.web.replace('https://','').replace('http://','').replace(/\/$/,'')}
           </a>
         </td>
       </tr>`;
   }).join('');
-}
+});
 </script>
 </body>
 </html>
