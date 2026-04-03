@@ -1,32 +1,34 @@
 {
   "_instructions": {
-    "step_1_party_details": "Update the party details below when confirmed. Set 'manifestoStatus' to 'published' and 'estimated' to false when the manifesto is released. Add the manifesto URL.",
-    "step_2_scores": "Update each score in 'topicScores' based on the published manifesto. Use the scale below.",
+    "step_1_when_manifesto_published": "When you receive the manifesto analysis JSON: (1) Add a 'topicScores' block to it (see ref_manifesto.json for the template), (2) save it as parties/ref_manifesto.json, (3) set 'manifestoFile' below to 'parties/ref_manifesto.json'. The website will then read all party info and scores directly from the manifesto file.",
+    "step_2_fallback_scores": "The 'topicScores' in THIS file are only used when no manifestoFile is set. They are pre-manifesto estimates. Once a manifestoFile is set, these are ignored.",
     "score_scale": {
       "5": "STRONGLY CHAMPIONS — A flagship commitment, central to their manifesto",
       "4": "SUPPORTIVE — Included in their programme, a clear positive position",
       "3": "NEUTRAL — No clear position, ambiguous, or not mentioned",
       "2": "MILD OPPOSITION — Sceptical or would scale back",
       "1": "STRONGLY OPPOSED — Explicitly against, would reverse or block"
-    },
-    "tip": "When in doubt between two scores, pick the lower one to avoid overstating a party's commitment."
+    }
   },
 
   "id": "ref",
   "name": "Reform UK Scotland",
   "short": "Reform",
-  "leader": "To be confirmed",
-  "web": "https://www.reformparty.uk",
-  "manifestoStatus": "pending",
-  "manifestoUrl": null,
-  "estimated": true,
+  "leader": "Malcolm Offord",
+  "web": "https://reformuk.scot",
+  "manifestoStatus": "published",
+  "manifestoUrl": "https://www.reformparty.uk/scotland-manifesto.pdf",
+  "estimated": false,
   "colour": {
     "bg": "#12B6DF",
     "fg": "#FFFFFF",
     "border": "#0994BA"
   },
 
+  "manifestoFile": "parties/ref_manifesto.json",
+
   "topicScores": {
+    "_note": "Fallback estimates — only used if manifestoFile is missing or fails to load.",
     "independence": 1,
     "nhs":          3,
     "education":    2,

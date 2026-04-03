@@ -1,0 +1,140 @@
+{
+  "_instructions": {
+    "about": "This is the official manifesto data file for Reform UK Scotland. It follows the standard manifesto JSON schema. When you receive a manifesto analysis JSON for any party, add the 'topicScores' block below and save as parties/{id}_manifesto.json. Then update the matching party file (e.g. ref.json) to set 'manifestoFile' to point to this file.",
+    "topicScores_guide": {
+      "about": "Score each topic 1–5 based on the published manifesto content.",
+      "5": "STRONGLY CHAMPIONS — A flagship commitment, central to their manifesto",
+      "4": "SUPPORTIVE — Included in their programme, a clear positive position",
+      "3": "NEUTRAL — No clear position, ambiguous, or not mentioned",
+      "2": "MILD OPPOSITION — Sceptical or would scale back",
+      "1": "STRONGLY OPPOSED — Explicitly against, would reverse or block",
+      "tip": "When in doubt between two scores, pick the lower one to avoid overstating a party's commitment."
+    }
+  },
+
+  "schema_version": "1.0",
+  "analysis_id": "reform-scotland-2026-v1",
+  "created_at": "2026-03-29T14:00:00Z",
+
+  "party": {
+    "party_name": "Reform UK Scotland",
+    "party_short_name": "Reform",
+    "party_website": "https://reformuk.scot",
+    "party_leader": "Malcolm Offord"
+  },
+
+  "manifesto": {
+    "title": "Manifesto for Scotland 2026",
+    "election": "2026 Scottish Parliament election",
+    "jurisdiction": "Scotland",
+    "publication_year": 2026,
+    "manifesto_url": "https://www.reformparty.uk/scotland-manifesto.pdf",
+    "document_type": "pdf",
+    "verified_for_target_election": true,
+    "verification_notes": "Verified as the official 2026 Scottish Parliament manifesto from the party website."
+  },
+
+  "analysis_scope": {
+    "total_word_count_in_scope": 5209,
+    "total_sections_in_scope": 10
+  },
+
+  "priority_summary": {
+    "priority_count": 10,
+    "top_priority_by_focus": "Health, Social Care & Welfare"
+  },
+
+  "priorities": [
+    {
+      "priority_id": "reform-2026-health",
+      "priority_name": "Health, Social Care & Welfare",
+      "rank": 1,
+      "word_count": 838,
+      "focus_percentage": 16.1
+    },
+    {
+      "priority_id": "reform-2026-economy",
+      "priority_name": "Economy & Tax",
+      "rank": 2,
+      "word_count": 797,
+      "focus_percentage": 15.3
+    },
+    {
+      "priority_id": "reform-2026-housing",
+      "priority_name": "Housing & Communities",
+      "rank": 3,
+      "word_count": 786,
+      "focus_percentage": 15.1
+    },
+    {
+      "priority_id": "reform-2026-education",
+      "priority_name": "Employment, Education & Training",
+      "rank": 4,
+      "word_count": 705,
+      "focus_percentage": 13.5
+    },
+    {
+      "priority_id": "reform-2026-rural",
+      "priority_name": "Farming, Fishing & Rural Scotland",
+      "rank": 5,
+      "word_count": 447,
+      "focus_percentage": 8.6
+    },
+    {
+      "priority_id": "reform-2026-energy",
+      "priority_name": "Energy",
+      "rank": 6,
+      "word_count": 413,
+      "focus_percentage": 7.9
+    },
+    {
+      "priority_id": "reform-2026-justice",
+      "priority_name": "Policing & Justice",
+      "rank": 7,
+      "word_count": 382,
+      "focus_percentage": 7.3
+    },
+    {
+      "priority_id": "reform-2026-constitution",
+      "priority_name": "Constitutional / Governance",
+      "rank": 8,
+      "word_count": 330,
+      "focus_percentage": 6.3
+    },
+    {
+      "priority_id": "reform-2026-local",
+      "priority_name": "Local Authorities",
+      "rank": 9,
+      "word_count": 294,
+      "focus_percentage": 5.6
+    },
+    {
+      "priority_id": "reform-2026-transport",
+      "priority_name": "Transport & Infrastructure",
+      "rank": 10,
+      "word_count": 217,
+      "focus_percentage": 4.2
+    }
+  ],
+
+  "topicScores": {
+    "_note": "Scores derived from published manifesto. 1=strongly opposed, 3=neutral/not mentioned, 5=flagship commitment.",
+    "independence": 1,
+    "nhs":          4,
+    "education":    3,
+    "climate":      1,
+    "economy":      5,
+    "housing":      4,
+    "costliving":   4,
+    "transport":    3,
+    "socialcare":   4,
+    "drugs":        1,
+    "landreform":   1,
+    "policing":     5,
+    "energy":       2,
+    "equality":     1,
+    "rural":        4,
+    "immigration":  1,
+    "tax":          5
+  }
+}

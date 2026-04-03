@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find My Match – Manifesto Match Scotland 2026</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span id="nav-logo"></span>
+      <div>
+        <span class="nav-brand-text">Manifesto Match</span>
+        <span class="nav-brand-sub">Scotland 2026</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <a href="match.html" class="btn btn-primary btn-sm">Find My Match →</a>
+  </div>
+</nav>
+
+<main>
+  <div class="container">
+    <div style="padding:32px 0 0">
+      <div class="sh">Find Your Match</div>
+      <p class="sh-s">Choose the issues you care about, then tell us where you stand.</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="stepper">
+      <div class="step-item active" id="si-1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Choose Topics</div>
+      </div>
+      <div class="step-item" id="si-2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Set Positions</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Topic selection -->
+    <div id="step-1">
+      <div class="sel-counter">
+        <div>
+          <span class="sel-count" id="cnt">0</span>
+          <span style="color:var(--text-2);font-size:.875rem"> / 10 topics selected</span>
+        </div>
+        <button class="btn btn-primary" id="btn-next" onclick="toStep2()" disabled>Set Positions →</button>
+      </div>
+      <div class="pri-grid" id="pri-grid">
+        <div style="color:var(--text-muted);font-size:.875rem;padding:12px">Loading topics…</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Set positions -->
+    <div id="step-2" style="display:none">
+      <div class="mb4">
+        <button onclick="toStep1()" style="background:none;border:none;font-family:var(--font-b);font-size:.875rem;color:var(--accent);cursor:pointer;font-weight:600">← Back to topic selection</button>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div style="font-family:var(--font-d);font-size:1.1rem;font-weight:600">Your Position on Each Topic</div>
+          <p style="font-size:.875rem;color:var(--text-2);margin-top:4px">Set a direction and strength for each topic. Strength sets how much this topic weighs in your final score.</p>
+        </div>
+        <div class="card-body" id="pos-container"></div>
+      </div>
+      <div style="margin-top:22px;text-align:right">
+        <button class="btn btn-primary btn-lg" onclick="goToResults()">Calculate My Match →</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="js/main.js"></script>
+<script>
+const sel     = new Set();
+const userPos = {};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  initNav('match');
+  initFooter();
+  try {
+    await loadData();
+    TOPICS.forEach(t => { userPos[t.id] = { dir: 'support', str: 3 }; });
+    renderGrid();
+  } catch(e) { showLoadError(e.message); }
+});
+
+/* ── STEP 1 ── */
+function renderGrid() {
+  byId('pri-grid').innerHTML = TOPICS.map(t => `
+    <div class="pri-card ${sel.has(t.id) ? 'picked' : ''}" onclick="toggleTopic('${t.id}')">
+      <div class="pri-tick">
+        ${sel.has(t.id) ? `<svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M2 5.5L4.5 8L9 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>` : ''}
+      </div>
+      <div class="pri-icon">${t.icon}</div>
+      <div class="pri-name">${t.name}</div>
+      <div class="pri-desc">${t.desc}</div>
+    </div>
+  `).join('');
+  byId('cnt').textContent = sel.size;
+  byId('btn-next').disabled = sel.size === 0;
+}
+
+function toggleTopic(id) {
+  if (sel.has(id)) { sel.delete(id); }
+  else {
+    if (sel.size >= 10) { alert('You can select up to 10 topics. Deselect one to add another.'); return; }
+    sel.add(id);
+  }
+  renderGrid();
+}
+
+function toStep1() {
+  byId('step-1').style.display = '';
+  byId('step-2').style.display = 'none';
+  byId('si-1').className = 'step-item active';
+  byId('si-2').className = 'step-item';
+  window.scrollTo(0,0);
+}
+
+function toStep2() {
+  if (!sel.size) return;
+  byId('step-1').style.display = 'none';
+  byId('step-2').style.display = '';
+  byId('si-1').className = 'step-item done';
+  byId('si-2').className = 'step-item active';
+  renderPos();
+  window.scrollTo(0,0);
+}
+
+/* ── STEP 2 ── */
+function renderPos() {
+  byId('pos-container').innerHTML = [...sel].map(id => {
+    const t  = topic(id);
+    const p  = userPos[id];
+    const ql = t.questionLabels || {};
+    const d  = t.dirs || [];
+    const supLbl  = d[0] || ql.support || 'Support';
+    const neutLbl = d[1] || ql.neutral || 'Neutral';
+    const oppLbl  = d[2] || ql.oppose  || 'Oppose';
+    return `
+      <div class="pos-row">
+        <div class="pos-title"><span>${t.icon}</span> ${t.name}</div>
+        <div class="pos-desc">${t.desc}</div>
+        <div class="dir-btns">
+          <button class="dir-btn ${p.dir==='support' ? 'd-sup'  : ''}" onclick="setDir('${id}','support')">✓ ${supLbl}</button>
+          <button class="dir-btn ${p.dir==='neutral' ? 'd-neut' : ''}" onclick="setDir('${id}','neutral')">— ${neutLbl}</button>
+          <button class="dir-btn ${p.dir==='oppose'  ? 'd-opp'  : ''}" onclick="setDir('${id}','oppose')">✗ ${oppLbl}</button>
+        </div>
+        <div class="str-row">
+          <span class="str-label">How important is this to you?</span>
+          <div class="str-dots">
+            ${[1,2,3,4,5].map(n => `<div class="str-dot ${p.str >= n ? 'active' : ''}" onclick="setStr('${id}',${n})" title="${strLbl(n)}">${n}</div>`).join('')}
+          </div>
+          <span class="str-label">&nbsp;${strLbl(p.str)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function setDir(id, dir) { userPos[id].dir = dir; renderPos(); }
+function setStr(id, n)   { userPos[id].str = n;   renderPos(); }
+
+/* ── CALCULATE & NAVIGATE TO RESULTS ── */
+function goToResults() {
+  const ids = [...sel];
+
+  // Save state to sessionStorage for results.html to read
+  sessionStorage.setItem('mm_sel',    JSON.stringify(ids));
+  sessionStorage.setItem('mm_pos',    JSON.stringify(userPos));
+  sessionStorage.setItem('mm_parties', JSON.stringify(PARTIES));
+  sessionStorage.setItem('mm_topics',  JSON.stringify(TOPICS));
+
+  window.location.href = 'results.html';
+}
+</script>
+</body>
+</html>

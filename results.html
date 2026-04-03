@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Results – Manifesto Match Scotland 2026</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span id="nav-logo"></span>
+      <div>
+        <span class="nav-brand-text">Manifesto Match</span>
+        <span class="nav-brand-sub">Scotland 2026</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <a href="match.html" class="btn btn-primary btn-sm">Find My Match →</a>
+  </div>
+</nav>
+
+<main>
+  <div class="container">
+    <div class="res-head">
+      <div class="sh">Your Manifesto Match</div>
+      <p style="color:var(--text-2)">Based on your selected topics and positions</p>
+    </div>
+    <div id="results-wrap">
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">Calculating your results…</div>
+    </div>
+    <div class="tc" style="margin:48px 0 32px">
+      <a href="match.html" class="btn btn-outline">← Adjust My Priorities</a>
+    </div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  initNav('results');
+  initFooter();
+
+  // Restore state saved by match.html
+  const selRaw     = sessionStorage.getItem('mm_sel');
+  const posRaw     = sessionStorage.getItem('mm_pos');
+  const partiesRaw = sessionStorage.getItem('mm_parties');
+  const topicsRaw  = sessionStorage.getItem('mm_topics');
+
+  if (!selRaw || !posRaw || !partiesRaw || !topicsRaw) {
+    document.getElementById('results-wrap').innerHTML = `
+      <div class="banner banner-warn" style="margin-bottom:24px">
+        <span class="banner-icon">⚠️</span>
+        <div>No results found. Please <a href="match.html" style="color:var(--accent);font-weight:600">complete the matching questionnaire</a> first.</div>
+      </div>`;
+    return;
+  }
+
+  const sel     = JSON.parse(selRaw);
+  const userPos = JSON.parse(posRaw);
+  PARTIES       = JSON.parse(partiesRaw);
+  TOPICS        = JSON.parse(topicsRaw);
+
+  calcAndRender(sel, userPos);
+});
+
+/* ── SCORING ENGINE ────────────────────────────────── */
+//   MC = USS × (PS − 3) × userSign
+//   userSign: support=+1, neutral=0, oppose=−1
+//   (PS−3) maps party score 1-5 to -2..+2
+
+function calcAndRender(ids, userPos) {
+  const raw = PARTIES.map(pt => {
+    let pms = 0;
+    const contribs = ids.map(tid => {
+      const tp    = TOPICS.find(t => t.id === tid);
+      const ps    = (tp.partyScores || {})[pt.id] ?? 3;
+      const { dir, str: uss } = userPos[tid];
+      const usign = dir === 'support' ? 1 : dir === 'oppose' ? -1 : 0;
+      const mc    = uss * (ps - 3) * usign;
+      pms += mc;
+      return { tid, mc, ps, uss, dir };
+    });
+    return { pt, pms, contribs };
+  });
+
+  // Normalise 0–100
+  const scores = raw.map(r => r.pms);
+  const mx = Math.max(...scores), mn = Math.min(...scores);
+  const rng = mx - mn;
+  raw.forEach(r => { r.norm = rng <= 0 ? 50 : Math.round((r.pms - mn) / rng * 100); });
+  raw.sort((a,b) => b.norm - a.norm);
+
+  renderResults(raw);
+}
+
+function renderResults(results) {
+  const medals  = ['🥇','🥈','🥉'];
+  const rankCls = ['gold','silver','bronze','','',''];
+
+  document.getElementById('results-wrap').innerHTML = results.map((r, i) => {
+    const { pt, norm, contribs } = r;
+    const pos = contribs.filter(c => c.mc > 0).sort((a,b) => b.mc - a.mc).slice(0,3);
+    const neg = contribs.filter(c => c.mc < 0).sort((a,b) => a.mc - b.mc).slice(0,3);
+
+    const estBadge = pt.estimated
+      ? `<span style="font-size:.64rem;font-weight:600;background:var(--warn-bg);color:var(--warn);padding:2px 7px;border-radius:99px;margin-left:6px">Estimated</span>`
+      : '';
+
+    return `
+      <div class="res-card ${rankCls[i] || ''}">
+        <div class="res-top">
+          <div class="res-rank">${i < 3 ? medals[i] : i+1}</div>
+          <div style="display:flex;align-items:center;gap:11px;flex:1">
+            ${logo(pt.id)}
+            <div class="res-party">
+              <div class="res-name">${pt.name}${estBadge}</div>
+              <div class="res-lead">${pt.leader}</div>
+            </div>
+          </div>
+          <div class="res-score-box">
+            <div class="res-score">${norm}%</div>
+            <div class="res-score-lbl">Match</div>
+          </div>
+        </div>
+
+        <div class="res-bar">
+          <div class="res-fill" style="width:0%" data-w="${norm}"></div>
+        </div>
+
+        <button class="expand-btn" onclick="toggleDetail('${pt.id}')">▸ Show breakdown</button>
+
+        <div class="res-detail" id="det-${pt.id}">
+          ${pos.length ? `
+            <div style="margin-bottom:16px">
+              <div class="detail-section-title" style="color:var(--ok)">✓ Top alignments</div>
+              ${pos.map(c => {
+                const t  = TOPICS.find(t => t.id === c.tid);
+                const dl = dirLabel(t, c.dir);
+                return `<div class="detail-row">
+                  <span>${t.icon}</span>
+                  <span class="dr-name">${t.name}</span>
+                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party: ${c.ps}/5</span>
+                </div>`;
+              }).join('')}
+            </div>` : ''}
+          ${neg.length ? `
+            <div style="margin-bottom:16px">
+              <div class="detail-section-title" style="color:var(--err)">✗ Key mismatches</div>
+              ${neg.map(c => {
+                const t  = TOPICS.find(t => t.id === c.tid);
+                const dl = dirLabel(t, c.dir);
+                return `<div class="detail-row">
+                  <span>${t.icon}</span>
+                  <span class="dr-name">${t.name}</span>
+                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party: ${c.ps}/5</span>
+                </div>`;
+              }).join('')}
+            </div>` : ''}
+          ${pt.estimated ? `
+            <div class="banner banner-warn" style="margin-top:10px">
+              <span class="banner-icon">⚠️</span>
+              <span>This party's 2026 manifesto has not yet been published. Scores are estimated from existing policy positions.</span>
+            </div>` : ''}
+          <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap">
+            <a href="${pt.web}" target="_blank" rel="noopener" style="font-size:.8125rem;color:var(--accent);font-weight:600">Visit ${pt.short} website →</a>
+            ${pt.manifestoUrl ? `<a href="${pt.manifestoUrl}" target="_blank" rel="noopener" style="font-size:.8125rem;color:var(--accent);font-weight:600">Read manifesto →</a>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Animate bars
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.querySelectorAll('.res-fill[data-w]').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }));
+}
+
+function toggleDetail(id) {
+  const d = document.getElementById('det-' + id);
+  const b = d.previousElementSibling;
+  d.classList.toggle('open');
+  b.textContent = d.classList.contains('open') ? '▾ Hide breakdown' : '▸ Show breakdown';
+}
+</script>
+</body>
+</html>

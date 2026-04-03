@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About – Manifesto Match Scotland 2026</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span id="nav-logo"></span>
+      <div>
+        <span class="nav-brand-text">Manifesto Match</span>
+        <span class="nav-brand-sub">Scotland 2026</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <a href="match.html" class="btn btn-primary btn-sm">Find My Match →</a>
+  </div>
+</nav>
+
+<main>
+  <div class="container">
+    <div class="section">
+      <div class="sh">About Manifesto Match</div>
+      <div class="sh-s">A non-partisan tool for Scottish voters</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+
+        <div class="card">
+          <div class="card-head" style="font-family:var(--font-d);font-size:1rem;font-weight:600">What it is</div>
+          <div class="card-body">
+            <p style="font-size:.9rem;color:var(--text-2);line-height:1.8">Manifesto Match is an independent, non-partisan tool helping Scottish voters understand which parties best reflect their own policy priorities ahead of the 2026 Scottish Parliament election.</p>
+            <p style="font-size:.9rem;color:var(--text-2);line-height:1.8;margin-top:12px">It is not voting advice. It is a starting point for your own research.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head" style="font-family:var(--font-d);font-size:1rem;font-weight:600">What it is not</div>
+          <div class="card-body">
+            <p style="font-size:.9rem;color:var(--text-2);line-height:1.8">We do not endorse any political party. We are not affiliated with any party, campaign, or political organisation. No party has paid to be included or scored in any particular way.</p>
+            <p style="font-size:.9rem;color:var(--text-2);line-height:1.8;margin-top:12px">Party scores involve judgement, and reasonable people may disagree. Our methodology is fully transparent — see the <a href="methodology.html" style="color:var(--accent)">Methodology page</a>.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-head" style="font-family:var(--font-d);font-size:1rem;font-weight:600">How the data works</div>
+        <div class="card-body">
+          <p style="font-size:.9rem;color:var(--text-2);line-height:1.8;margin-bottom:14px">Each party has a data file that contains their scores on every topic. Until a party publishes its 2026 manifesto, scores are estimated from existing public policy positions and clearly labelled as estimated. When a manifesto is published, the data file is updated and the site reflects the new scores automatically on next load.</p>
+          <p style="font-size:.9rem;color:var(--text-2);line-height:1.8">All data files are openly available in the site's GitHub repository. If you believe a score is incorrect or would like to suggest a correction, please use the <a href="contact.html" style="color:var(--accent)">Contact page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  initNav('about');
+  initFooter();
+});
+</script>
+</body>
+</html>

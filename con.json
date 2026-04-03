@@ -1,7 +1,7 @@
 {
   "_instructions": {
-    "step_1_party_details": "Update the party details below when confirmed. Set 'manifestoStatus' to 'published' and 'estimated' to false when the manifesto is released. Add the manifesto URL.",
-    "step_2_scores": "Update each score in 'topicScores' based on the published manifesto. Use the scale below.",
+    "step_1_when_manifesto_published": "When you receive the manifesto analysis JSON: (1) Add a 'topicScores' block to it (see ref_manifesto.json for the template), (2) save it as parties/con_manifesto.json, (3) set 'manifestoFile' below to 'parties/con_manifesto.json'. The website will then read all party info and scores directly from the manifesto file.",
+    "step_2_fallback_scores": "The 'topicScores' in THIS file are only used when no manifestoFile is set. They are pre-manifesto estimates. Once a manifestoFile is set, these are ignored.",
     "score_scale": {
       "5": "STRONGLY CHAMPIONS — A flagship commitment, central to their manifesto",
       "4": "SUPPORTIVE — Included in their programme, a clear positive position",
@@ -25,6 +25,8 @@
     "fg": "#FFFFFF",
     "border": "#001E5E"
   },
+
+  "manifestoFile": null,
 
   "topicScores": {
     "independence": 1,

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology – Manifesto Match Scotland 2026</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span id="nav-logo"></span>
+      <div>
+        <span class="nav-brand-text">Manifesto Match</span>
+        <span class="nav-brand-sub">Scotland 2026</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <a href="match.html" class="btn btn-primary btn-sm">Find My Match →</a>
+  </div>
+</nav>
+
+<main>
+  <div class="container">
+    <div class="section">
+      <div class="sh">How We Calculate Your Match</div>
+      <div class="sh-s">A transparent account of our scoring formula</div>
+
+      <div class="meth-card">
+        <h3>1 — You select topics and set your positions</h3>
+        <p>Choose up to 10 policy areas. For each, you pick a <strong>direction</strong> and a <strong>strength</strong> from 1 (slight preference) to 5 (extremely strongly held). The labels for each direction are specific to the topic — for example, on NHS funding the choice is "Increase investment / Keep as is / Reduce &amp; reform" rather than a generic "Support / Neutral / Oppose". Neutral direction contributes zero to your score regardless of your strength, which lets you include topics you're undecided on without skewing results.</p>
+        <div class="formula">USS  = User Strength (1–5)
+Direction → Sign:  Left option = +1,  Middle = 0,  Right option = −1</div>
+      </div>
+
+      <div class="meth-card">
+        <h3>2 — Party positions are scored from their manifesto</h3>
+        <p>Each party's position on every topic is rated 1–5 based on their published manifesto. Where a manifesto has not yet been published, scores are estimated from existing public policy positions and clearly marked as estimated. Scores are derived from official manifesto text; all scoring decisions are documented in the party data files.</p>
+        <div class="formula">PS  = Party Score (1–5)
+  5 = Strongly champions — a flagship commitment
+  4 = Supportive — included in their programme
+  3 = Neutral — no clear position or not mentioned
+  2 = Mild opposition — sceptical or would scale back
+  1 = Strongly opposed — would reverse or block</div>
+      </div>
+
+      <div class="meth-card">
+        <h3>3 — Match contribution calculated per topic</h3>
+        <p>For each topic, we calculate how well your position aligns with the party's position. The formula converts the party's 1–5 score into a −2 to +2 range by subtracting 3. This means a party that strongly supports an issue (+2) and a user who supports it produce a large positive contribution; a mismatch produces a negative contribution. The user's strength multiplies the contribution, so topics you care deeply about count more.</p>
+        <div class="formula">MC  (Match Contribution) = USS × (PS − 3) × UserSign
+
+Example — you strongly support NHS investment (USS=5, Sign=+1):
+  Party A scores 5 on NHS:  MC = 5 × (5−3) × 1  =  +10  ✓ strong match
+  Party B scores 1 on NHS:  MC = 5 × (1−3) × 1  =  −10  ✗ mismatch
+
+Example — you strongly oppose independence (USS=5, Sign=−1):
+  Party C scores 5 on independence:  MC = 5 × (5−3) × −1  =  −10  ✗ mismatch
+  Party D scores 1 on independence:  MC = 5 × (1−3) × −1  =  +10  ✓ strong match</div>
+      </div>
+
+      <div class="meth-card">
+        <h3>4 — Scores normalised to 0–100</h3>
+        <p>Raw Party Match Scores (PMS) are summed across all your selected topics. Because raw scores can be negative or span a wide range depending on how many topics you chose and how strongly you feel, we normalise them so the best-matching party always scores 100% and the worst-matching always scores 0%, with others sitting proportionally between them.</p>
+        <div class="formula">PMS          = Σ MC  (sum of all match contributions across your selected topics)
+Normalised   = (PMS − min) ÷ (max − min) × 100</div>
+      </div>
+
+      <div class="meth-card">
+        <h3>Limitations &amp; transparency</h3>
+        <p>Party scores involve judgement calls when interpreting manifesto text. Where a manifesto has not been published, scores are estimated — this is flagged clearly on every result card. All party data files are publicly available in the site's GitHub repository. This tool is non-partisan; all parties are scored using the same scale and methodology. It is for informational purposes only and does not constitute voting advice.</p>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  initNav('methodology');
+  initFooter();
+});
+</script>
+</body>
+</html>
