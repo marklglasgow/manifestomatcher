@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Parties – Manifesto Match Scotland 2026</title>
+<title>Parties – Scot Vote Manifesto Matcher</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-.pty-table td, .pty-table th { padding: 18px 22px; }
+.pty-table td, .pty-table th { padding: 16px 20px; }
 .party-cell  { display:flex; align-items:center; gap:12px; }
 .party-name  { font-weight:600; font-size:.9375rem; }
 .m-published { color:#2A6844; font-weight:700; font-size:.875rem; }
@@ -16,6 +16,10 @@
 .m-link      { display:block; margin-top:5px; font-size:.8rem; color:var(--accent); text-decoration:none; font-weight:600; }
 .m-link:hover{ text-decoration:underline; }
 .m-note      { display:block; margin-top:4px; font-size:.75rem; color:var(--text-muted); }
+.source-tag  { display:inline-block; font-size:.68rem; font-weight:700; text-transform:uppercase;
+               letter-spacing:.05em; padding:2px 8px; border-radius:4px; margin-top:5px; }
+.source-manifesto { background:var(--ok-bg); color:var(--ok); }
+.source-website   { background:var(--bg-subtle); color:var(--text-muted); }
 .site-link   { color:var(--accent); text-decoration:none; font-size:.875rem; font-weight:500; }
 .site-link:hover { text-decoration:underline; }
 </style>
@@ -25,10 +29,10 @@
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
-      <span id="nav-logo"></span>
+      <img src="logo-icon.png" alt="Scot Vote Manifesto Matcher icon" style="height:42px;width:auto;display:block">
       <div>
-        <span class="nav-brand-text">Manifesto Match</span>
-        <span class="nav-brand-sub">Scotland 2026</span>
+        <span class="nav-brand-text">Scot Vote</span>
+        <span class="nav-brand-sub">Manifesto Matcher</span>
       </div>
     </a>
     <ul class="nav-links" id="nav-links"></ul>
@@ -41,24 +45,31 @@
     <div class="section">
 
       <div class="sh">Parties &amp; Manifestos</div>
-      <div class="sh-s">2026 Scottish Parliament election — manifesto publication status</div>
+      <div class="sh-s">2026 Scottish Parliament election — manifesto and data source status</div>
+
+      <div class="banner banner-info mb8">
+        <span class="banner-icon">ℹ️</span>
+        <div>Where a party's 2026 manifesto has been published, match scores are derived from that document. Where it has not yet been published, scores are estimated from the party's website and campaign materials. Both sources are clearly indicated.</div>
+      </div>
 
       <div style="overflow-x:auto">
-        <table class="pty-table" id="party-table">
+        <table class="pty-table">
           <thead>
             <tr>
               <th>Party</th>
               <th>Leader</th>
-              <th>Manifesto</th>
+              <th>Score Source</th>
               <th>Website</th>
             </tr>
           </thead>
-          <tbody id="party-tbody"></tbody>
+          <tbody id="party-tbody">
+            <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:32px">Loading…</td></tr>
+          </tbody>
         </table>
       </div>
 
       <p style="margin-top:14px;font-size:.78rem;color:var(--text-muted)">
-        * Where a manifesto has not yet been published, match scores are estimated from each party's existing public policy positions.
+        * Scores based on website or campaign materials will be updated automatically when the official manifesto is published and added to the data files.
       </p>
 
     </div>
@@ -69,116 +80,54 @@
 
 <script src="main.js"></script>
 <script>
-
-/* ── Party data baked directly into this page ───────
-   Update each party here when their manifesto is published:
-     published:     true  / false
-     manifestoUrl:  URL string / null
-   ─────────────────────────────────────────────────── */
-const PAGE_PARTIES = [
-  {
-    id: 'lab',
-    name: 'Scottish Labour',
-    short: 'Labour',
-    leader: 'Anas Sarwar MSP',
-    web: 'https://www.scottishlabour.org.uk',
-    published: false,
-    manifestoUrl: null,
-    colour: { bg:'#E4003B', fg:'#FFFFFF', border:'#B80030' }
-  },
-  {
-    id: 'snp',
-    name: 'Scottish National Party',
-    short: 'SNP',
-    leader: 'John Swinney MSP',
-    web: 'https://www.snp.org',
-    published: false,
-    manifestoUrl: null,
-    colour: { bg:'#FFF060', fg:'#000000', border:'#CCBB00' }
-  },
-  {
-    id: 'con',
-    name: 'Scottish Conservative Party',
-    short: 'Con',
-    leader: 'Russell Findlay MSP',
-    web: 'https://www.scottishconservatives.com',
-    published: false,
-    manifestoUrl: null,
-    colour: { bg:'#003087', fg:'#FFFFFF', border:'#001E5E' }
-  },
-  {
-    id: 'ld',
-    name: 'Scottish Liberal Democrats',
-    short: 'LD',
-    leader: 'Alex Cole-Hamilton MSP',
-    web: 'https://www.scotlibdems.org.uk',
-    published: false,
-    manifestoUrl: null,
-    colour: { bg:'#FAA61A', fg:'#FFFFFF', border:'#D88500' }
-  },
-  {
-    id: 'ref',
-    name: 'Reform UK Scotland',
-    short: 'Reform',
-    leader: 'Malcolm Offord',
-    web: 'https://reformuk.scot',
-    published: true,
-    manifestoUrl: 'https://www.reformparty.uk/scotland-manifesto.pdf',
-    colour: { bg:'#12B6DF', fg:'#FFFFFF', border:'#0994BA' }
-  }
-];
-
-/* ── Render party logo badge ──────────────────────── */
-function partyLogo(p, sm) {
-  const sz = sm ? 28 : 36, r = sm ? 6 : 8, fs = sm ? 8 : 9.5;
-  const lbl = p.short.length > 5 ? p.short.slice(0,5) : p.short;
-  const c = p.colour;
-  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}"
-    xmlns="http://www.w3.org/2000/svg"
-    style="flex-shrink:0;border-radius:${r}px;display:inline-block;vertical-align:middle">
-    <rect width="${sz}" height="${sz}" rx="${r}"
-      fill="${c.bg}" stroke="${c.border}" stroke-width="1.2"/>
-    <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle"
-      font-family="'DM Sans',system-ui,sans-serif"
-      font-weight="800" font-size="${fs}" fill="${c.fg}"
-      letter-spacing="-0.3">${lbl}</text>
-  </svg>`;
-}
-
-/* ── Build table rows ─────────────────────────────── */
-function buildTable() {
-  document.getElementById('party-tbody').innerHTML = PAGE_PARTIES.map(p => `
-    <tr>
-      <td>
-        <div class="party-cell">
-          ${partyLogo(p)}
-          <span class="party-name">${p.name}</span>
-        </div>
-      </td>
-      <td>${p.leader}</td>
-      <td>
-        ${p.published
-          ? `<span class="m-published">✓ Published</span>
-             ${p.manifestoUrl
-               ? `<a class="m-link" href="${p.manifestoUrl}" target="_blank" rel="noopener">View manifesto →</a>`
-               : ''}`
-          : `<span class="m-pending">Not Published</span>
-             <span class="m-note">* Scores estimated from existing positions</span>`
-        }
-      </td>
-      <td>
-        <a class="site-link" href="${p.web}" target="_blank" rel="noopener">
-          ${p.web.replace('https://','').replace('http://','').replace(/\/$/,'')}
-        </a>
-      </td>
-    </tr>
-  `).join('');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initNav('parties');
   initFooter();
-  buildTable();
+
+  try {
+    await loadData();
+  } catch(e) {
+    showLoadError(e.message);
+    return;
+  }
+
+  const tbody = document.getElementById('party-tbody');
+
+  if (!PARTIES.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:32px">No party data found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = PARTIES.map(p => {
+    const published = p.manifestoStatus === 'published';
+
+    const sourceCell = published
+      ? `<span class="m-published">✓ Published Manifesto</span>
+         <span class="source-tag source-manifesto">Manifesto</span>
+         ${p.manifestoUrl
+           ? `<a class="m-link" href="${p.manifestoUrl}" target="_blank" rel="noopener">Read manifesto →</a>`
+           : ''}`
+      : `<span class="m-pending">Not Published</span>
+         <span class="source-tag source-website">Website &amp; Campaign</span>
+         <span class="m-note">* Scores estimated from party website and campaign materials</span>`;
+
+    return `
+      <tr>
+        <td>
+          <div class="party-cell">
+            ${logo(p.id)}
+            <span class="party-name">${p.name}</span>
+          </div>
+        </td>
+        <td style="font-size:.875rem">${p.leader}</td>
+        <td>${sourceCell}</td>
+        <td>
+          <a class="site-link" href="${p.web}" target="_blank" rel="noopener">
+            ${p.web.replace('https://','').replace('http://','').replace(/\/$/,'')}
+          </a>
+        </td>
+      </tr>`;
+  }).join('');
 });
 </script>
 </body>

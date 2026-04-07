@@ -3,20 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Results – Manifesto Match Scotland 2026</title>
+<title>Your Results – Scot Vote Manifesto Matcher</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.source-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .65rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; padding: 2px 8px; border-radius: 4px;
+  margin-left: 8px; vertical-align: middle;
+}
+.source-manifesto { background: var(--ok-bg);     color: var(--ok); }
+.source-website    { background: var(--bg-subtle); color: var(--text-muted); }
+
+.discrepancy-block {
+  background: #FDF8EC;
+  border: 1px solid #E8D48B;
+  border-radius: var(--r);
+  padding: 13px 16px;
+  margin-top: 14px;
+}
+.discrepancy-block .disc-title {
+  font-size: .72rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .08em; color: #8A6318; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.disc-row {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: .8125rem; margin-bottom: 8px; line-height: 1.4;
+}
+.disc-row:last-child { margin-bottom: 0; }
+.disc-topic  { font-weight: 600; min-width: 140px; }
+.disc-detail { color: var(--text-2); font-size: .775rem; }
+.disc-arrow  { color: var(--text-muted); margin: 0 3px; }
+</style>
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
-      <span id="nav-logo"></span>
+      <img src="logo-icon.png" alt="Scot Vote Manifesto Matcher icon" style="height:42px;width:auto;display:block">
       <div>
-        <span class="nav-brand-text">Manifesto Match</span>
-        <span class="nav-brand-sub">Scotland 2026</span>
+        <span class="nav-brand-text">Scot Vote</span>
+        <span class="nav-brand-sub">Manifesto Matcher</span>
       </div>
     </a>
     <ul class="nav-links" id="nav-links"></ul>
@@ -27,7 +58,7 @@
 <main>
   <div class="container">
     <div class="res-head">
-      <div class="sh">Your Manifesto Match</div>
+      <div class="sh">Your Match Results</div>
       <p style="color:var(--text-2)">Based on your selected topics and positions</p>
     </div>
     <div id="results-wrap">
@@ -47,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initNav('results');
   initFooter();
 
-  // Restore state saved by match.html
   const selRaw     = sessionStorage.getItem('mm_sel');
   const posRaw     = sessionStorage.getItem('mm_pos');
   const partiesRaw = sessionStorage.getItem('mm_parties');
@@ -70,57 +100,135 @@ document.addEventListener('DOMContentLoaded', () => {
   calcAndRender(sel, userPos);
 });
 
-/* ── SCORING ENGINE ────────────────────────────────── */
-//   MC = USS × (PS − 3) × userSign
-//   userSign: support=+1, neutral=0, oppose=−1
-//   (PS−3) maps party score 1-5 to -2..+2
-
+/* ══════════════════════════════════════════════════════════════
+   SCORING ENGINE
+   MC = USS × (PS − 3) × userSign
+   Primary source: partyScores (manifesto if published, else website)
+   Fallback source: partyWebsiteScores (always website-based)
+   ══════════════════════════════════════════════════════════════ */
 function calcAndRender(ids, userPos) {
   const raw = PARTIES.map(pt => {
     let pms = 0;
     const contribs = ids.map(tid => {
-      const tp    = TOPICS.find(t => t.id === tid);
-      const ps    = (tp.partyScores || {})[pt.id] ?? 3;
+      const tp  = TOPICS.find(t => t.id === tid);
+
+      // Primary: manifesto score if available, else website score
+      const ps  = (tp.partyScores        || {})[pt.id] ?? 3;
+      // For discrepancy check: what the website says
+      const wps = (tp.partyWebsiteScores || {})[pt.id] ?? ps;
+
       const { dir, str: uss } = userPos[tid];
       const usign = dir === 'support' ? 1 : dir === 'oppose' ? -1 : 0;
       const mc    = uss * (ps - 3) * usign;
       pms += mc;
-      return { tid, mc, ps, uss, dir };
+      return { tid, mc, ps, wps, uss, dir };
     });
     return { pt, pms, contribs };
   });
 
   // Normalise 0–100
   const scores = raw.map(r => r.pms);
-  const mx = Math.max(...scores), mn = Math.min(...scores);
-  const rng = mx - mn;
+  const mx = Math.max(...scores), mn = Math.min(...scores), rng = mx - mn;
   raw.forEach(r => { r.norm = rng <= 0 ? 50 : Math.round((r.pms - mn) / rng * 100); });
-  raw.sort((a,b) => b.norm - a.norm);
+  raw.sort((a, b) => b.norm - a.norm);
 
-  renderResults(raw);
+  renderResults(raw, ids, userPos);
 }
 
-function renderResults(results) {
+/* ── Direction label helpers ───────────────────────────────── */
+const SCORE_LABEL = {
+  5: 'strongly champions',
+  4: 'supportive',
+  3: 'neutral / no clear position',
+  2: 'mild opposition',
+  1: 'strongly opposed'
+};
+
+function scoreDirection(manifestoScore, websiteScore, topicId) {
+  /* Describe the shift from website to manifesto in plain English */
+  const diff = manifestoScore - websiteScore;
+  if (Math.abs(diff) < 2) return null; // not significant
+
+  const mLbl = SCORE_LABEL[manifestoScore] || manifestoScore;
+  const wLbl = SCORE_LABEL[websiteScore]   || websiteScore;
+
+  const direction = diff > 0
+    ? 'more supportive in their manifesto than their website suggests'
+    : 'less supportive in their manifesto than their website suggests';
+
+  return { diff, direction, mLbl, wLbl };
+}
+
+/* ── Render all result cards ───────────────────────────────── */
+function renderResults(results, ids, userPos) {
   const medals  = ['🥇','🥈','🥉'];
   const rankCls = ['gold','silver','bronze','','',''];
 
   document.getElementById('results-wrap').innerHTML = results.map((r, i) => {
     const { pt, norm, contribs } = r;
-    const pos = contribs.filter(c => c.mc > 0).sort((a,b) => b.mc - a.mc).slice(0,3);
-    const neg = contribs.filter(c => c.mc < 0).sort((a,b) => a.mc - b.mc).slice(0,3);
 
-    const estBadge = pt.estimated
+    const pos = contribs.filter(c => c.mc > 0).sort((a, b) => b.mc - a.mc).slice(0, 3);
+    const neg = contribs.filter(c => c.mc < 0).sort((a, b) => a.mc - b.mc).slice(0, 3);
+
+    // ── Source badge ──────────────────────────────────────────
+    const hasManifesto = pt.manifestoStatus === 'published';
+    const sourceBadge  = hasManifesto
+      ? `<span class="source-tag source-manifesto">📄 Manifesto</span>`
+      : `<span class="source-tag source-website">🌐 Website</span>`;
+
+    const estBadge = !hasManifesto
       ? `<span style="font-size:.64rem;font-weight:600;background:var(--warn-bg);color:var(--warn);padding:2px 7px;border-radius:99px;margin-left:6px">Estimated</span>`
       : '';
+
+    // ── Discrepancy check ─────────────────────────────────────
+    // Only relevant when party HAS a manifesto (scores come from manifesto)
+    // and the website says something meaningfully different (diff ≥ 2)
+    let discrepancies = [];
+    if (hasManifesto) {
+      discrepancies = contribs
+        .map(c => {
+          const shift = scoreDirection(c.ps, c.wps, c.tid);
+          if (!shift) return null;
+          const t = TOPICS.find(t => t.id === c.tid);
+          return { topic: t, shift, manifesto: c.ps, website: c.wps };
+        })
+        .filter(Boolean);
+    }
+
+    const discrepancyBlock = discrepancies.length > 0 ? `
+      <div class="discrepancy-block">
+        <div class="disc-title">
+          ℹ️ Manifesto vs website differences on your topics
+        </div>
+        <p style="font-size:.78rem;color:var(--text-2);margin-bottom:10px;line-height:1.5">
+          Your match score uses the published manifesto. On the following topics, the party's website
+          and campaign materials suggest a different emphasis to what's in the manifesto:
+        </p>
+        ${discrepancies.map(d => `
+          <div class="disc-row">
+            <span>${d.topic.icon}</span>
+            <div>
+              <span class="disc-topic">${d.topic.name}</span>
+              <span class="disc-detail">
+                Manifesto: <strong>${d.shift.mLbl}</strong>
+                <span class="disc-arrow">vs</span>
+                Website: <strong>${d.shift.wLbl}</strong>
+                — ${d.shift.direction}.
+              </span>
+            </div>
+          </div>`).join('')}
+      </div>` : '';
 
     return `
       <div class="res-card ${rankCls[i] || ''}">
         <div class="res-top">
-          <div class="res-rank">${i < 3 ? medals[i] : i+1}</div>
+          <div class="res-rank">${i < 3 ? medals[i] : i + 1}</div>
           <div style="display:flex;align-items:center;gap:11px;flex:1">
             ${logo(pt.id)}
             <div class="res-party">
-              <div class="res-name">${pt.name}${estBadge}</div>
+              <div class="res-name">
+                ${pt.name}${sourceBadge}${estBadge}
+              </div>
               <div class="res-lead">${pt.leader}</div>
             </div>
           </div>
@@ -137,6 +245,7 @@ function renderResults(results) {
         <button class="expand-btn" onclick="toggleDetail('${pt.id}')">▸ Show breakdown</button>
 
         <div class="res-detail" id="det-${pt.id}">
+
           ${pos.length ? `
             <div style="margin-bottom:16px">
               <div class="detail-section-title" style="color:var(--ok)">✓ Top alignments</div>
@@ -146,10 +255,11 @@ function renderResults(results) {
                 return `<div class="detail-row">
                   <span>${t.icon}</span>
                   <span class="dr-name">${t.name}</span>
-                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party: ${c.ps}/5</span>
+                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party manifesto: ${c.ps}/5</span>
                 </div>`;
               }).join('')}
             </div>` : ''}
+
           ${neg.length ? `
             <div style="margin-bottom:16px">
               <div class="detail-section-title" style="color:var(--err)">✗ Key mismatches</div>
@@ -159,24 +269,39 @@ function renderResults(results) {
                 return `<div class="detail-row">
                   <span>${t.icon}</span>
                   <span class="dr-name">${t.name}</span>
-                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party: ${c.ps}/5</span>
+                  <span class="dr-meta">You: ${dl} (${c.uss}/5) · Party manifesto: ${c.ps}/5</span>
                 </div>`;
               }).join('')}
             </div>` : ''}
-          ${pt.estimated ? `
+
+          ${discrepancyBlock}
+
+          ${!hasManifesto ? `
             <div class="banner banner-warn" style="margin-top:10px">
               <span class="banner-icon">⚠️</span>
-              <span>This party's 2026 manifesto has not yet been published. Scores are estimated from existing policy positions.</span>
+              <div>
+                <strong>No manifesto published yet.</strong>
+                This match is based on the party's website and campaign materials.
+                Scores will update automatically when their 2026 manifesto is published.
+              </div>
             </div>` : ''}
+
           <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap">
-            <a href="${pt.web}" target="_blank" rel="noopener" style="font-size:.8125rem;color:var(--accent);font-weight:600">Visit ${pt.short} website →</a>
-            ${pt.manifestoUrl ? `<a href="${pt.manifestoUrl}" target="_blank" rel="noopener" style="font-size:.8125rem;color:var(--accent);font-weight:600">Read manifesto →</a>` : ''}
+            <a href="${pt.web}" target="_blank" rel="noopener"
+               style="font-size:.8125rem;color:var(--accent);font-weight:600">
+              Visit ${pt.short} website →
+            </a>
+            ${pt.manifestoUrl ? `
+              <a href="${pt.manifestoUrl}" target="_blank" rel="noopener"
+                 style="font-size:.8125rem;color:var(--accent);font-weight:600">
+                Read manifesto →
+              </a>` : ''}
           </div>
         </div>
       </div>`;
   }).join('');
 
-  // Animate bars
+  // Animate bars after paint
   requestAnimationFrame(() => requestAnimationFrame(() => {
     document.querySelectorAll('.res-fill[data-w]').forEach(el => {
       el.style.width = el.dataset.w + '%';

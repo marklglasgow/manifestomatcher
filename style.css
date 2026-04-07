@@ -61,11 +61,12 @@ body {
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-brand {
-  display: flex; align-items: center; gap: 11px;
+  display: flex; align-items: center; gap: 10px;
   text-decoration: none;
 }
-.nav-brand-text { font-family: var(--font-d); font-size: 1.1rem; font-weight: 700; color: var(--accent); letter-spacing: -.02em; }
-.nav-brand-sub  { font-size: .62rem; font-weight: 600; color: var(--text-muted); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: -2px; }
+.nav-brand img { display: block; height: 42px; width: auto; border-radius: 6px; }
+.nav-brand-text { font-family: var(--font-d); font-size: 1rem; font-weight: 700; color: var(--accent); letter-spacing: -.02em; line-height: 1.2; }
+.nav-brand-sub  { font-size: .6rem; font-weight: 700; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; display: block; margin-top: 1px; }
 .nav-links      { display: flex; gap: 2px; list-style: none; }
 .nav-links a {
   display: block; text-decoration: none;
